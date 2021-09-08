@@ -1,0 +1,35 @@
+version: '2.1'
+
+services:
+  app:
+    container_name: commentix_app
+    build:
+      dockerfile: Dockerfile
+      context: ./docker
+    ports:
+      - "50000:50000"
+    restart: on-failure
+    networks:
+      - default
+    volumes:
+      - ./src:/go/src/github.com/mihnealun/commentix
+      - ./docker:/go/src/github.com/mihnealun/commentix/docker
+    env_file:
+      - src/.env
+
+  neo4j:
+    container_name: commentix_neo4j
+    image: bitnami/neo4j:latest
+    ports:
+      - '7474:7474'
+      - '7473:7473'
+      - '7687:7687'
+    volumes:
+      - ./neo4j_data:/bitnami
+    env_file:
+      - src/.env
+    networks:
+      - default
+
+networks:
+  default:
