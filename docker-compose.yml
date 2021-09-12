@@ -16,6 +16,9 @@ services:
       - ./docker:/go/src/github.com/mihnealun/commentix/docker
     env_file:
       - src/.env
+    depends_on:
+      neo4j:
+        condition: service_healthy
 
   neo4j:
     container_name: commentix_neo4j
@@ -30,6 +33,10 @@ services:
       - src/.env
     networks:
       - default
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:7474/"]
+      timeout: 20s
+      retries: 10
 
 networks:
   default:

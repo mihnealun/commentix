@@ -17,6 +17,14 @@ type Config struct {
 
 	Interface string `required:"true"`
 	Port      int    `required:"true"`
+
+	NeoHost          string `required:"true" envconfig:"neo4j_host"`
+	NeoPort          int    `required:"true" envconfig:"neo4j_port"`
+	NeoUser          string `required:"true" envconfig:"neo4j_user"`
+	NeoPass          string `required:"true" envconfig:"neo4j_password"`
+	NeoLogLevel      string `required:"true" envconfig:"neo4j_log_level"`
+	NeoPoolSize      int    `required:"true" envconfig:"neo4j_pool_size"`
+	NeoIndexStrategy string `required:"true" envconfig:"neo4j_index_strategy"`
 }
 
 var instanceConfig *Config

@@ -1,11 +1,9 @@
 package controller
 
 import (
-	"net/http"
-	"strconv"
-
 	_ "github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
+	"net/http"
 
 	"github.com/mihnealun/commentix/domain/entity"
 	"github.com/mihnealun/commentix/infrastructure/container"
@@ -51,23 +49,23 @@ func (pc Comment) Create(context echo.Context, c container.Container) error {
 
 func (pc Comment) buildComment(context echo.Context) entity.Comment {
 	result := entity.Comment{}
-
-	result.CommentID, _ = strconv.Atoi(context.FormValue("id"))
-	result.Body = context.FormValue("body")
-	result.Status = entity.Status{
-		ID:    12,
-		Label: "Active",
-	}
-	result.User = entity.User{
-		ID:         11,
-		Name:       context.FormValue("user"),
-		PlatformID: "comments",
-	}
-	result.App = entity.App{
-		ID:   12,
-		Name: "RealityKings",
-		Slug: "rk",
-	}
+	//
+	//result.CommentID, _ = strconv.Atoi(context.FormValue("id"))
+	//result.Body = context.FormValue("body")
+	//result.Status = entity.Status{
+	//	ID:    12,
+	//	Label: "Active",
+	//}
+	//result.User = entity.User{
+	//	ID:         11,
+	//	Name:       context.FormValue("user"),
+	//	PlatformID: "comments",
+	//}
+	//result.App = entity.App{
+	//	ID:   12,
+	//	Name: "RealityKings",
+	//	Slug: "rk",
+	//}
 
 	return result
 }

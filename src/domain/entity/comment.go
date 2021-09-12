@@ -1,34 +1,43 @@
 package entity
 
-type User struct {
-	ID         int    `json:"id" bson:"id"`
-	Name       string `json:"name" bson:"name"`
-	PlatformID string `json:"platform_id" bson:"platform_id"`
-}
+import (
+	"github.com/mindstand/gogm/v2"
+)
 
-type Status struct {
-	ID    int    `json:"id" bson:"id"`
-	Label string `json:"label" bson:"label"`
+//type tdString string
+//type tdInt int
+
+type User struct {
+	gogm.BaseUUIDNode
+	Name     string     `gogm:"name=name"`
+	Type     string     `gogm:"name=type"`
+	Status   string     `gogm:"name=status"`
+	Comments []*Comment `gogm:"direction=outgoing;relationship=commented_rel"`
 }
 
 type Target struct {
-	ID   int    `json:"id" bson:"id"`
-	Type string `json:"type" bson:"type"`
+	gogm.BaseUUIDNode
+	Name     string     `gogm:"name=name"`
+	Type     string     `gogm:"name=type"`
+	Url      string     `gogm:"name=url"`
+	Comments []*Comment `gogm:"direction=incoming;relationship=targets_rel"`
 }
 
 type App struct {
-	ID   int    `json:"id" bson:"id"`
-	Name string `json:"name" bson:"name"`
-	Slug string `json:"slug" bson:"slug"`
+	gogm.BaseUUIDNode
+	Name     string     `gogm:"name=name"`
+	Slug     string     `gogm:"name=slug"`
+	Comments []*Comment `gogm:"direction=incoming;relationship=posted_on_rel"`
 }
 
-// Comment document structure
 type Comment struct {
-	CommentID int       `json:"comment_id" bson:"comment_id"`
-	Body      string    `json:"body" bson:"body"`
-	User      User      `json:"user" bson:"user"`
-	Status    Status    `json:"status" bson:"status"`
-	Target    Target    `json:"target" bson:"target"`
-	App       App       `json:"app" bson:"app"`
-	Replies   []Comment `json:"replies" bson:"replies"`
+	gogm.BaseUUIDNode
+	Body      string     `gogm:"name=body"`
+	Type      string     `gogm:"name=type"`
+	Status    string     `gogm:"name=status"`
+	CreatedAt int        `gogm:"name=created_at"`
+	User      *User      `gogm:"direction=incoming;relationship=commented_rel"`
+	Target    *Target    `gogm:"direction=outgoing;relationship=targets_rel"`
+	App       *App       `gogm:"direction=outgoing;relationship=posted_on_rel"`
+	Replies   []*Comment `gogm:"direction=incoming;relationship=replies_to_rel"`
 }

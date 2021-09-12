@@ -22,8 +22,8 @@ func PreparePublicRoutes(e *echo.Echo, containerInstance container.Container) {
 	})
 
 	e.POST("/comment", func(c echo.Context) error {
-		commentController := controller.Comment{}
+		ctrl := controller.Comment{}
 
-		return commentController.Create(c, containerInstance)
+		return ctrl.Create(c, containerInstance)
 	})
 }
