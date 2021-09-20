@@ -15,11 +15,15 @@ type Container interface {
 	GetConfig() *Config
 	GetLogger(ctx context.Context) (Logger, error)
 	GetCommentService() service.Comment
+	GetUserService() service.User
+	GetTargetService() service.Target
+	GetAppService() service.App
 }
 
 type container struct {
 	config    *Config
 	ogmConfig gogm.Config
+	gogm      *gogm.Gogm
 }
 
 var instance *container
@@ -43,6 +47,10 @@ func GetInstance() (c Container, err error) {
 			// Encrypted:     false,
 			IndexStrategy: gogm.IGNORE_INDEX,
 		}
+		err = instance.InitStorageDriver()
+		if err != nil {
+			panic(err)
+		}
 	})
 
 	return instance, err
@@ -57,13 +65,31 @@ func (c *container) GetLogger(ctx context.Context) (Logger, error) {
 	return newStdLogger(ctx, c.config)
 }
 
-func (c *container) GetCommentService() service.Comment {
-	_gogm, err := gogm.New(&c.ogmConfig, gogm.UUIDPrimaryKeyStrategy, &entity.Comment{}, &entity.Target{}, &entity.User{}, &entity.App{})
+func (c *container) InitStorageDriver() error {
+	var err error
+
+	c.gogm, err = gogm.New(&c.ogmConfig, gogm.UUIDPrimaryKeyStrategy, &entity.Comment{}, &entity.Target{}, &entity.User{}, &entity.App{})
 	if err != nil {
 		panic(err)
 	}
 
-	gogm.SetGlobalGogm(_gogm)
+	gogm.SetGlobalGogm(c.gogm)
 
-	return storage.NewCommentService(_gogm)
+	return nil
+}
+
+func (c *container) GetCommentService() service.Comment {
+	return storage.NewCommentService(c.gogm)
+}
+
+func (c *container) GetUserService() service.User {
+	return storage.NewUserService(c.gogm)
+}
+
+func (c *container) GetTargetService() service.Target {
+	return storage.NewTargetService(c.gogm)
+}
+
+func (c *container) GetAppService() service.App {
+	return storage.NewAppService(c.gogm)
 }

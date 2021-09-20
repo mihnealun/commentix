@@ -10,12 +10,16 @@ const (
 )
 
 type Comment interface {
-	Like(CommentID int, UserID int) error
-	Dislike(CommentID int, UserID int) error
-	Report(CommentID int, UserID int) error
+	ListComments(TargetID string) []*entity.Comment
+	Like(CommentID string, UserID string) bool
+	Dislike(CommentID string, UserID string) bool
+	Report(CommentID string, UserID string) bool
 
-	Add(UserId, TargetId, AppId string, comment entity.Comment) *entity.Comment
-	Delete(CommentId string) error
-	Update(CommentId string, comment entity.Comment) error
-	Reply(UserId, ParentId string, comment entity.Comment) string
+	AddComment(UserId, TargetId, AppId string, comment entity.Comment) *entity.Comment
+	DeleteComment(CommentId string) error
+	UpdateComment(CommentId string, comment entity.Comment) error
+	AddReply(UserId, ParentId string, comment entity.Comment) *entity.Comment
+
+	AddTarget(target entity.Target) *entity.Target
+	AddApp(app entity.App) *entity.App
 }
