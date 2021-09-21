@@ -3,6 +3,23 @@ github.com/adam-hanna/arrayOperations
 # github.com/cornelk/hashmap v1.0.1
 ## explicit
 github.com/cornelk/hashmap
+# github.com/cucumber/gherkin-go/v19 v19.0.3
+github.com/cucumber/gherkin-go/v19
+# github.com/cucumber/godog v0.12.1
+## explicit
+github.com/cucumber/godog
+github.com/cucumber/godog/colors
+github.com/cucumber/godog/formatters
+github.com/cucumber/godog/internal/builder
+github.com/cucumber/godog/internal/flags
+github.com/cucumber/godog/internal/formatters
+github.com/cucumber/godog/internal/models
+github.com/cucumber/godog/internal/parser
+github.com/cucumber/godog/internal/storage
+github.com/cucumber/godog/internal/tags
+github.com/cucumber/godog/internal/utils
+# github.com/cucumber/messages-go/v16 v16.0.1
+github.com/cucumber/messages-go/v16
 # github.com/dchest/siphash v1.2.2
 ## explicit
 github.com/dchest/siphash
@@ -16,9 +33,17 @@ github.com/go-playground/universal-translator
 # github.com/go-playground/validator/v10 v10.3.0
 ## explicit
 github.com/go-playground/validator/v10
+# github.com/gofrs/uuid v4.0.0+incompatible
+github.com/gofrs/uuid
 # github.com/google/uuid v1.3.0
 ## explicit
 github.com/google/uuid
+# github.com/hashicorp/go-immutable-radix v1.3.0
+github.com/hashicorp/go-immutable-radix
+# github.com/hashicorp/go-memdb v1.3.0
+github.com/hashicorp/go-memdb
+# github.com/hashicorp/golang-lru v0.5.4
+github.com/hashicorp/golang-lru/simplelru
 # github.com/joho/godotenv v1.3.0
 ## explicit
 github.com/joho/godotenv
@@ -30,7 +55,6 @@ github.com/kelseyhightower/envconfig
 github.com/labstack/echo/v4
 github.com/labstack/echo/v4/middleware
 # github.com/labstack/gommon v0.3.0
-## explicit
 github.com/labstack/gommon/bytes
 github.com/labstack/gommon/color
 github.com/labstack/gommon/log
@@ -42,12 +66,12 @@ github.com/mattn/go-colorable
 # github.com/mattn/go-isatty v0.0.12
 github.com/mattn/go-isatty
 # github.com/mindstand/go-cypherdsl v0.2.0
+## explicit
 github.com/mindstand/go-cypherdsl
 # github.com/mindstand/gogm/v2 v2.2.0
 ## explicit
 github.com/mindstand/gogm/v2
 # github.com/neo4j/neo4j-go-driver/v4 v4.3.3
-## explicit
 github.com/neo4j/neo4j-go-driver/v4/neo4j
 github.com/neo4j/neo4j-go-driver/v4/neo4j/db
 github.com/neo4j/neo4j-go-driver/v4/neo4j/dbtype
@@ -64,8 +88,8 @@ github.com/opentracing/opentracing-go/log
 # github.com/sirupsen/logrus v1.8.1
 ## explicit
 github.com/sirupsen/logrus
-# github.com/stretchr/testify v1.6.1
-## explicit
+# github.com/spf13/pflag v1.0.5
+github.com/spf13/pflag
 # github.com/valyala/bytebufferpool v1.0.0
 github.com/valyala/bytebufferpool
 # github.com/valyala/fasttemplate v1.1.0
