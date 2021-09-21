@@ -14,7 +14,7 @@ func NewSuccessResponse(message string) ActionResultResponse {
 
 func NewErrorResponse(message string) ActionResultResponse {
 	return ActionResultResponse{
-		Success: true,
+		Success: false,
 		Message: message,
 	}
 }

@@ -1,6 +1,8 @@
 package response
 
-import "github.com/mihnealun/commentix/domain/entity"
+import (
+	"github.com/mihnealun/commentix/domain/entity"
+)
 
 type CommentListResponse struct {
 	Comments []CommentResponse `json:"comments"`
@@ -9,6 +11,10 @@ type CommentListResponse struct {
 func NewCommentListResponse(comments []*entity.Comment) CommentListResponse {
 	result := CommentListResponse{
 		Comments: []CommentResponse{},
+	}
+
+	if comments == nil {
+		return result
 	}
 
 	for _, c := range comments {

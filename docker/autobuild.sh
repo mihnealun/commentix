@@ -9,6 +9,7 @@ application_binary_path="/go/src/github.com/mihnealun/commentix/main"
 build_application() {
   echo "-=Building=- $application_binary_path"
   go build -mod=vendor main.go
+  sleep 3
 
   return
 }

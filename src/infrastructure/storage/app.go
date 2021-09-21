@@ -23,13 +23,12 @@ func (a *app) Add(app entity.App) *entity.App {
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	defer a.commitAndClose(sess)
-
 	err = sess.Begin(context.Background())
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	defer a.commitAndClose(sess)
 
 	err = sess.SaveDepth(context.Background(), &app, 1)
 	if err != nil {

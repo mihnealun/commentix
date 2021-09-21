@@ -1,6 +1,8 @@
 package response
 
-import "github.com/mihnealun/commentix/domain/entity"
+import (
+	"github.com/mihnealun/commentix/domain/entity"
+)
 
 type CommentResponse struct {
 	ID       string `json:"id"`
@@ -17,11 +19,20 @@ type CommentResponse struct {
 		Name   string `json:"name"`
 		Status string `json:"status"`
 	} `json:"user"`
-	AppName string `json:"app"`
+	AppName    string `json:"app"`
+	Likes      int    `json:"likes"`
+	Dislikes   int    `json:"dislikes"`
+	Reports    int    `json:"reports"`
+	ReplyCount int    `json:"reply_count"`
 }
 
 func NewCommentResponse(comment *entity.Comment) CommentResponse {
+	if comment == nil {
+		return CommentResponse{}
+	}
+
 	return CommentResponse{
+		ID:       comment.UUID,
 		Body:     comment.Body,
 		UserName: comment.User.Name,
 		Status:   comment.Status,
@@ -43,6 +54,10 @@ func NewCommentResponse(comment *entity.Comment) CommentResponse {
 			Name:   comment.User.Name,
 			Status: comment.User.Status,
 		},
-		AppName: comment.App.Name,
+		AppName:    comment.App.Name,
+		Likes:      len(comment.Likers),
+		Dislikes:   len(comment.Dislikers),
+		Reports:    len(comment.Reporters),
+		ReplyCount: len(comment.Replies),
 	}
 }

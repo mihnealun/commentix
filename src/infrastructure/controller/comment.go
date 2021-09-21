@@ -10,10 +10,6 @@ import (
 	"net/http"
 )
 
-const (
-	DateFormat = "2006-01-02T15:04:05Z"
-)
-
 type Comment struct{}
 
 // Get will process the input parameters and return a CommentResponse
@@ -23,7 +19,7 @@ func (pc Comment) Get(context echo.Context, c container.Container) error {
 
 // List will process the input parameters and return a CommentResponse
 func (pc Comment) List(context echo.Context, c container.Container) error {
-	comments := c.GetCommentService().ListComments(context.Param("target"))
+	comments := c.GetCommentService().List(context.Param("target"))
 
 	return context.JSON(http.StatusOK, response.NewCommentListResponse(comments))
 }
@@ -37,11 +33,16 @@ func (pc Comment) Create(context echo.Context, c container.Container) error {
 		Status:       "active",
 	}
 
-	result := c.GetCommentService().AddComment(
+	result := c.GetCommentService().Create(
 		context.FormValue("user"),
 		context.FormValue("target"),
 		context.FormValue("app"),
-		comment)
+		comment,
+	)
 
-	return context.JSON(http.StatusOK, response.NewCommentResponse(result))
+	if result == nil {
+		return context.JSON(http.StatusNotFound, response.NewErrorResponse("Entity not found."))
+	}
+
+	return context.JSON(http.StatusCreated, response.NewCommentResponse(result))
 }

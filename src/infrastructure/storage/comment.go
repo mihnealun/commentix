@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/mihnealun/commentix/domain/entity"
 	"github.com/mihnealun/commentix/domain/service"
+	gocypherdsl "github.com/mindstand/go-cypherdsl"
 	"github.com/mindstand/gogm/v2"
 	"log"
 )
@@ -18,10 +19,10 @@ func NewCommentService(driver *gogm.Gogm) service.Comment {
 	}
 }
 
-func (c *comment) AddComment(UserId, TargetId, AppId string, comment entity.Comment) *entity.Comment {
+func (c *comment) Create(UserId, TargetId, AppId string, comment entity.Comment) *entity.Comment {
 	sess, err := c.driver.NewSessionV2(gogm.SessionConfig{AccessMode: gogm.AccessModeWrite})
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 
 	err = sess.Begin(context.Background())
@@ -33,6 +34,11 @@ func (c *comment) AddComment(UserId, TargetId, AppId string, comment entity.Comm
 	comment.Target = c.GetTarget(TargetId)
 	comment.App = c.GetApp(AppId)
 	comment.User = c.GetUser(UserId)
+
+	if comment.Target == nil || comment.App == nil || comment.User == nil {
+		log.Println("Entity not found")
+		return nil
+	}
 
 	err = sess.SaveDepth(context.Background(), &comment, 2)
 	if err != nil {
@@ -48,7 +54,7 @@ func (c *comment) AddComment(UserId, TargetId, AppId string, comment entity.Comm
 	return &result
 }
 
-func (c *comment) AddCommentRaw(User *entity.User, Target *entity.Target, App *entity.App, Comment entity.Comment) *entity.Comment {
+func (c *comment) AddRaw(User *entity.User, Target *entity.Target, App *entity.App, Comment entity.Comment) *entity.Comment {
 	sess, err := c.driver.NewSessionV2(gogm.SessionConfig{AccessMode: gogm.AccessModeWrite})
 	if err != nil {
 		panic(err)
@@ -78,59 +84,7 @@ func (c *comment) AddCommentRaw(User *entity.User, Target *entity.Target, App *e
 	return &result
 }
 
-func (c *comment) AddApp(app entity.App) *entity.App {
-	sess, err := c.driver.NewSessionV2(gogm.SessionConfig{AccessMode: gogm.AccessModeWrite})
-	if err != nil {
-		panic(err)
-	}
-
-	err = sess.Begin(context.Background())
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer c.commitAndClose(sess)
-
-	err = sess.SaveDepth(context.Background(), app, 2)
-	if err != nil {
-		panic(err)
-	}
-
-	var result entity.App
-	err = sess.Load(context.Background(), &result, app.UUID)
-	if err != nil {
-		panic(err)
-	}
-
-	return &result
-}
-
-func (c *comment) AddTarget(target entity.Target) *entity.Target {
-	sess, err := c.driver.NewSessionV2(gogm.SessionConfig{AccessMode: gogm.AccessModeWrite})
-	if err != nil {
-		panic(err)
-	}
-
-	err = sess.Begin(context.Background())
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer c.commitAndClose(sess)
-
-	err = sess.SaveDepth(context.Background(), target, 2)
-	if err != nil {
-		panic(err)
-	}
-
-	var result entity.Target
-	err = sess.Load(context.Background(), &result, target.UUID)
-	if err != nil {
-		panic(err)
-	}
-
-	return &result
-}
-
-func (c *comment) DeleteComment(CommentId string) error {
+func (c *comment) Delete(CommentId string) error {
 	sess, err := c.driver.NewSessionV2(gogm.SessionConfig{AccessMode: gogm.AccessModeWrite})
 	if err != nil {
 		return err
@@ -159,32 +113,28 @@ func (c *comment) DeleteComment(CommentId string) error {
 	return nil
 }
 
-func (c *comment) UpdateComment(CommentId string, comment entity.Comment) error {
+func (c *comment) Update(CommentId string, comment entity.Comment) error {
 	panic("implement me")
 }
 
-func (c *comment) ListComments(TargetID string) []*entity.Comment {
-	/*
-		MATCH (u:User)-[r1:CREATED]-(n:Comment)-[r:TARGETS]-(t:Target {uuid:'c62f74df-a965-4468-b0ed-d18919db2403'}) RETURN u, r1, n, r, t LIMIT 25
-	*/
-
+func (c *comment) List(TargetID string) []*entity.Comment {
 	var allComments []*entity.Comment
 
-	sess, err := c.driver.NewSessionV2(gogm.SessionConfig{AccessMode: gogm.AccessModeWrite})
+	sess, err := c.driver.NewSessionV2(gogm.SessionConfig{AccessMode: gogm.AccessModeRead})
 	if err != nil {
 		log.Println(err.Error())
 		return allComments
 	}
 
-	err = sess.Begin(context.Background())
-	if err != nil {
-		log.Println(err.Error())
-		return allComments
+	defer sess.Close()
+
+	condition := &gocypherdsl.ConditionConfig{
+		Name:              "n",
+		Field:             "uuid",
+		ConditionOperator: gocypherdsl.EqualToOperator,
+		Check:             TargetID,
 	}
-
-	defer c.commitAndClose(sess)
-
-	err = sess.LoadAll(context.Background(), &allComments)
+	err = sess.LoadAllDepthFilter(context.Background(), &allComments, 2, gocypherdsl.C(condition), nil)
 	if err != nil {
 		log.Println(err.Error())
 	}
@@ -256,7 +206,8 @@ func (c *comment) Dislike(CommentID string, UserID string) bool {
 
 	err = sess.SaveDepth(context.Background(), user, 2)
 	if err != nil {
-		panic(err)
+		log.Println(err.Error())
+		return false
 	}
 
 	return true
@@ -313,7 +264,7 @@ func (c *comment) AddReply(UserId, ParentId string, comment entity.Comment) *ent
 	comment.Type = "reply"
 	parent := c.GetComment(ParentId)
 	user := c.GetUser(UserId)
-	reply := c.AddCommentRaw(user, parent.Target, parent.App, comment)
+	reply := c.AddRaw(user, parent.Target, parent.App, comment)
 	parent.Replies = append(parent.Replies, reply)
 
 	err = sess.SaveDepth(context.Background(), parent, 2)
@@ -329,7 +280,6 @@ func (c *comment) GetUser(UserId string) *entity.User {
 	if err != nil {
 		panic(err)
 	}
-
 	defer sess.Close()
 
 	user := &entity.User{}
@@ -348,7 +298,6 @@ func (c *comment) GetComment(CommentId string) *entity.Comment {
 	if err != nil {
 		panic(err)
 	}
-
 	defer sess.Close()
 
 	comment := &entity.Comment{}
@@ -367,12 +316,11 @@ func (c *comment) GetTarget(TargetId string) *entity.Target {
 	if err != nil {
 		panic(err)
 	}
-
 	defer sess.Close()
 
 	target := &entity.Target{}
-	err = sess.Load(context.Background(), target, TargetId)
 
+	err = sess.Load(context.Background(), target, TargetId)
 	if err != nil {
 		log.Println(err.Error())
 		panic(err)
@@ -386,22 +334,14 @@ func (c *comment) GetApp(AppId string) *entity.App {
 	if err != nil {
 		panic(err)
 	}
-
-	err = sess.Begin(context.Background())
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	defer c.commitAndClose(sess)
+	defer sess.Close()
 
 	app := &entity.App{}
-	//query := `MATCH p=(ap:App {uuid:$appid}) RETURN p`
-	err = sess.Load(context.Background(), app, &AppId)
 
-	//err = sess.Query(context.Background(), query, map[string]interface{}{"appid": AppId}, app)
+	err = sess.Load(context.Background(), app, &AppId)
 	if err != nil {
 		log.Println(err.Error())
-		panic(err)
+		return nil
 	}
 
 	return app

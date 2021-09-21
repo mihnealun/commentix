@@ -56,19 +56,13 @@ func (u *user) Delete(user entity.User) bool {
 func (u *user) List() []*entity.User {
 	var allUsers []*entity.User
 
-	sess, err := u.driver.NewSessionV2(gogm.SessionConfig{AccessMode: gogm.AccessModeWrite})
+	sess, err := u.driver.NewSessionV2(gogm.SessionConfig{AccessMode: gogm.AccessModeRead})
 	if err != nil {
 		log.Println(err.Error())
 		return allUsers
 	}
 
-	err = sess.Begin(context.Background())
-	if err != nil {
-		log.Println(err.Error())
-		return allUsers
-	}
-
-	defer u.commitAndClose(sess)
+	defer sess.Close()
 
 	err = sess.LoadAll(context.Background(), &allUsers)
 	if err != nil {
