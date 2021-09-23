@@ -8,6 +8,8 @@ require (
 	github.com/dchest/siphash v1.2.2 // indirect
 	github.com/go-playground/validator/v10 v10.3.0
 	github.com/google/uuid v1.3.0 // indirect
+	github.com/hashicorp/go-immutable-radix v1.3.1 // indirect
+	github.com/hashicorp/go-memdb v1.3.2 // indirect
 	github.com/joho/godotenv v1.3.0
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/labstack/echo/v4 v4.1.16

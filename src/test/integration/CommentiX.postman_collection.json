@@ -1,0 +1,321 @@
+{
+	"info": {
+		"_postman_id": "42d8fc03-d875-4040-b006-c78d1788d043",
+		"name": "CommentiX",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Target",
+			"item": [
+				{
+					"name": "Create Target",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"console.log(\"Test:GET /create_target_SUCCESS\");",
+									"",
+									"utils.init(postman, responseCode, responseBody, tests);",
+									"",
+									"utils.testResponseStatus(200);",
+									"utils.testResponseBody(\"\\\"id\\\":\");"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:50000/target?name=videoNice 1&type=video&url=http://vix.ro",
+							"protocol": "http",
+							"host": [
+								"app"
+							],
+							"port": "50000",
+							"path": [
+								"target"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "videoNice 1"
+								},
+								{
+									"key": "type",
+									"value": "video"
+								},
+								{
+									"key": "url",
+									"value": "http://vix.ro"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Target Listing All",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"console.log(\"Test:GET /list_all_targets_SUCCESS\");",
+									"",
+									"utils.init(postman, responseCode, responseBody, tests);",
+									"",
+									"utils.testResponseStatus(200);",
+									"utils.testResponseBody(\"\\\"targets\\\":\");",
+									"",
+									"// postman.setGlobalVariable(\"keyCloakAccessToken\", utils.getObjectResponse().access_token); ",
+									"// postman.setGlobalVariable(\"keyCloakRefreshToken\", utils.getObjectResponse().refresh_token); ",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:50000/target",
+							"protocol": "http",
+							"host": [
+								"app"
+							],
+							"port": "50000",
+							"path": [
+								"target"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Comment",
+			"item": [
+				{
+					"name": "Create Comment",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:50000/comment?body=test comment 3&user=e6b82378-94bf-4703-a009-204c12084cfe&target=c62f74df-a965-4468-b0ed-d18919db2403&app=431bb8e0-5e41-41ff-962b-1c8763003d8b",
+							"protocol": "http",
+							"host": [
+								"app"
+							],
+							"port": "50000",
+							"path": [
+								"comment"
+							],
+							"query": [
+								{
+									"key": "body",
+									"value": "test comment 3"
+								},
+								{
+									"key": "user",
+									"value": "e6b82378-94bf-4703-a009-204c12084cfe"
+								},
+								{
+									"key": "target",
+									"value": "c62f74df-a965-4468-b0ed-d18919db2403"
+								},
+								{
+									"key": "app",
+									"value": "431bb8e0-5e41-41ff-962b-1c8763003d8b"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Comment Listing For Target",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:50000/comment/list/c62f74df-a965-4468-b0ed-d18919db2403",
+							"protocol": "http",
+							"host": [
+								"app"
+							],
+							"port": "50000",
+							"path": [
+								"comment",
+								"list",
+								"c62f74df-a965-4468-b0ed-d18919db2403"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "User",
+			"item": [
+				{
+					"name": "Create User",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:50000/user?name=matei",
+							"protocol": "http",
+							"host": [
+								"app"
+							],
+							"port": "50000",
+							"path": [
+								"user"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "matei"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "User Listing All",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:50000/user",
+							"protocol": "http",
+							"host": [
+								"app"
+							],
+							"port": "50000",
+							"path": [
+								"user"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "App",
+			"item": [
+				{
+					"name": "Create App",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:50000/app?name=ViX&slug=vx",
+							"protocol": "http",
+							"host": [
+								"app"
+							],
+							"port": "50000",
+							"path": [
+								"app"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "ViX"
+								},
+								{
+									"key": "slug",
+									"value": "vx"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "App Listing All",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:50000/app",
+							"protocol": "http",
+							"host": [
+								"app"
+							],
+							"port": "50000",
+							"path": [
+								"app"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"utils = {",
+					"    tests: {},",
+					"    responseCode: 0,",
+					"    responseBody: \"\",",
+					"    postman: null,",
+					"    objResponse: null,",
+					"    init: function(postman, responseCode, responseBody, tests) {",
+					"        this.tests = tests;",
+					"        this.postman = postman;",
+					"        this.responseCode = responseCode.code;",
+					"        this.responseBody = responseBody;",
+					"        this.objResponse = JSON.parse(responseBody);",
+					"    },",
+					"    // testHeaders: function() {",
+					"    //     this.tests[\"ResponseHeader - Content-Type is Defined as JSON\"] = this.postman.getResponseHeader(\"Content-Type\").has(\"application/json\");",
+					"    //     this.tests[\"ResponseHeader - Cache Control is no-cache\"] = this.postman.getResponseHeader(\"cache-control\").has(\"no-cache\");",
+					"    //     this.tests[\"ResponseHeader - Transfer-Encoding is chunked\"] = this.postman.getResponseHeader(\"Transfer-Encoding\").has(\"chunked\");",
+					"    // },",
+					"    testResponseStatus: function(statusCode) {",
+					"        this.tests[\"ResponseCode - Verify response StatusCode is <<\" + statusCode + \">>\"] = (this.responseCode === statusCode);",
+					"    },",
+					"    testResponseBody: function(stringData) {",
+					"        this.tests[\"ResponseBody - Contains << \"+ stringData +\" >>\"] = this.responseBody.has(stringData);",
+					"    },",
+					"    testResponseHasErrors: function() {",
+					"        this.tests[\"ResponseBody - Has errors\"] = (typeof this.objResponse[0] !== 'undefined') && (typeof this.objResponse[0].errors !== 'undefined');",
+					"    },",
+					"    getObjectResponse: function() {",
+					"        return this.objResponse;",
+					"    },",
+					"    getTests: function() {",
+					"        return this.tests;",
+					"    }",
+					"};",
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}
