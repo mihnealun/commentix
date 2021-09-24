@@ -9,6 +9,7 @@ type CommentResponse struct {
 	Body     string `json:"body"`
 	UserName string `json:"username"`
 	Status   string `json:"status"`
+	Type     string `json:"type"`
 	Target   struct {
 		ID   string `json:"id"`
 		Type string `json:"type"`
@@ -19,11 +20,12 @@ type CommentResponse struct {
 		Name   string `json:"name"`
 		Status string `json:"status"`
 	} `json:"user"`
-	AppName    string `json:"app"`
-	Likes      int    `json:"likes"`
-	Dislikes   int    `json:"dislikes"`
-	Reports    int    `json:"reports"`
-	ReplyCount int    `json:"reply_count"`
+	AppName    string            `json:"app"`
+	Likes      int               `json:"likes"`
+	Dislikes   int               `json:"dislikes"`
+	Reports    int               `json:"reports"`
+	ReplyCount int               `json:"reply_count"`
+	Replies    []CommentResponse `json:"replies"`
 }
 
 func NewCommentResponse(comment *entity.Comment) CommentResponse {
@@ -31,18 +33,12 @@ func NewCommentResponse(comment *entity.Comment) CommentResponse {
 		return CommentResponse{}
 	}
 
-	return CommentResponse{
+	result := CommentResponse{
 		ID:       comment.UUID,
 		Body:     comment.Body,
 		UserName: comment.User.Name,
 		Status:   comment.Status,
-		Target: struct {
-			ID   string `json:"id"`
-			Type string `json:"type"`
-		}{
-			ID:   comment.Target.UUID,
-			Type: comment.Target.Type,
-		},
+		Type:     comment.Type,
 		User: struct {
 			ID     string `json:"id"`
 			Type   string `json:"type"`
@@ -55,9 +51,22 @@ func NewCommentResponse(comment *entity.Comment) CommentResponse {
 			Status: comment.User.Status,
 		},
 		AppName:    comment.App.Name,
+		Replies:    NewCommentListResponse(comment.Replies).Comments,
 		Likes:      len(comment.Likers),
 		Dislikes:   len(comment.Dislikers),
 		Reports:    len(comment.Reporters),
 		ReplyCount: len(comment.Replies),
 	}
+
+	if comment.Target != nil {
+		result.Target = struct {
+			ID   string `json:"id"`
+			Type string `json:"type"`
+		}{
+			ID:   comment.Target.UUID,
+			Type: comment.Target.Type,
+		}
+	}
+
+	return result
 }

@@ -46,3 +46,67 @@ func (pc Comment) Create(context echo.Context, c container.Container) error {
 
 	return context.JSON(http.StatusCreated, response.NewCommentResponse(result))
 }
+
+// Reply will process the input parameters and return a Comment of type "reply"
+func (pc Comment) Reply(context echo.Context, c container.Container) error {
+	comment := entity.Comment{
+		BaseUUIDNode: gogm.BaseUUIDNode{},
+		Body:         context.FormValue("body"),
+		Type:         "reply",
+		Status:       "active",
+	}
+
+	result := c.GetCommentService().Reply(
+		context.FormValue("user"),
+		context.FormValue("parent"),
+		comment,
+	)
+
+	if result == nil {
+		return context.JSON(http.StatusNotFound, response.NewErrorResponse("Entity not found."))
+	}
+
+	return context.JSON(http.StatusCreated, response.NewCommentResponse(result))
+}
+
+// Like will process the input parameters and return success true
+func (pc Comment) Like(context echo.Context, c container.Container) error {
+	result := c.GetCommentService().Like(
+		context.FormValue("id"),
+		context.FormValue("user"),
+	)
+
+	if !result {
+		return context.JSON(http.StatusNotFound, response.NewErrorResponse("Already liked."))
+	}
+
+	return context.JSON(http.StatusCreated, response.NewSuccessResponse("Comment liked."))
+}
+
+// Dislike will process the input parameters and return success true
+func (pc Comment) Dislike(context echo.Context, c container.Container) error {
+	result := c.GetCommentService().Dislike(
+		context.FormValue("id"),
+		context.FormValue("user"),
+	)
+
+	if !result {
+		return context.JSON(http.StatusNotFound, response.NewErrorResponse("Already disliked."))
+	}
+
+	return context.JSON(http.StatusCreated, response.NewSuccessResponse("Comment disliked."))
+}
+
+// Report will process the input parameters and return success true
+func (pc Comment) Report(context echo.Context, c container.Container) error {
+	result := c.GetCommentService().Report(
+		context.FormValue("id"),
+		context.FormValue("user"),
+	)
+
+	if !result {
+		return context.JSON(http.StatusNotFound, response.NewErrorResponse("Already reported."))
+	}
+
+	return context.JSON(http.StatusCreated, response.NewSuccessResponse("Comment reported."))
+}

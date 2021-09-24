@@ -4,7 +4,6 @@ import (
 	"context"
 	"github.com/mihnealun/commentix/domain/entity"
 	"github.com/mihnealun/commentix/domain/service"
-	gocypherdsl "github.com/mindstand/go-cypherdsl"
 	"github.com/mindstand/gogm/v2"
 	"log"
 )
@@ -113,33 +112,15 @@ func (c *comment) Delete(CommentId string) error {
 	return nil
 }
 
-func (c *comment) Update(CommentId string, comment entity.Comment) error {
-	panic("implement me")
-}
+func (c *comment) List(TargetID string) (comments []*entity.Comment) {
+	t := c.GetTarget(TargetID)
 
-func (c *comment) List(TargetID string) []*entity.Comment {
-	var allComments []*entity.Comment
-
-	sess, err := c.driver.NewSessionV2(gogm.SessionConfig{AccessMode: gogm.AccessModeRead})
-	if err != nil {
-		log.Println(err.Error())
-		return allComments
+	if t == nil || len(t.Comments) == 0 {
+		log.Println("No comments found")
+		return comments
 	}
 
-	defer sess.Close()
-
-	condition := &gocypherdsl.ConditionConfig{
-		Name:              "n",
-		Field:             "uuid",
-		ConditionOperator: gocypherdsl.EqualToOperator,
-		Check:             TargetID,
-	}
-	err = sess.LoadAllDepthFilter(context.Background(), &allComments, 2, gocypherdsl.C(condition), nil)
-	if err != nil {
-		log.Println(err.Error())
-	}
-
-	return allComments
+	return t.Comments
 }
 
 func (c *comment) Like(CommentID string, UserID string) bool {
@@ -156,6 +137,9 @@ func (c *comment) Like(CommentID string, UserID string) bool {
 	defer c.commitAndClose(sess)
 
 	comment := c.GetComment(CommentID)
+	//if comment.User.UUID == UserID {
+	//	return false
+	//}
 	user := c.GetUser(UserID)
 
 	if comment.Likers != nil {
@@ -167,9 +151,10 @@ func (c *comment) Like(CommentID string, UserID string) bool {
 		}
 	}
 
+	user.LikedComments = append(user.LikedComments, comment)
 	comment.Likers = append(comment.Likers, user)
 
-	err = sess.SaveDepth(context.Background(), user, 2)
+	err = sess.SaveDepth(context.Background(), comment, 2)
 	if err != nil {
 		panic(err)
 	}
@@ -191,6 +176,10 @@ func (c *comment) Dislike(CommentID string, UserID string) bool {
 	defer c.commitAndClose(sess)
 
 	comment := c.GetComment(CommentID)
+	//if comment.User.UUID == UserID {
+	//	return false
+	//}
+
 	user := c.GetUser(UserID)
 
 	if comment.Dislikers != nil {
@@ -202,12 +191,12 @@ func (c *comment) Dislike(CommentID string, UserID string) bool {
 		}
 	}
 
+	user.DislikedComments = append(user.DislikedComments, comment)
 	comment.Dislikers = append(comment.Dislikers, user)
 
-	err = sess.SaveDepth(context.Background(), user, 2)
+	err = sess.SaveDepth(context.Background(), comment, 2)
 	if err != nil {
-		log.Println(err.Error())
-		return false
+		panic(err)
 	}
 
 	return true
@@ -227,6 +216,9 @@ func (c *comment) Report(CommentID string, UserID string) bool {
 	defer c.commitAndClose(sess)
 
 	comment := c.GetComment(CommentID)
+	//if comment.User.UUID == UserID {
+	//	return false
+	//}
 	user := c.GetUser(UserID)
 
 	if comment.Reporters != nil {
@@ -238,9 +230,10 @@ func (c *comment) Report(CommentID string, UserID string) bool {
 		}
 	}
 
+	user.ReportedComments = append(user.ReportedComments, comment)
 	comment.Reporters = append(comment.Reporters, user)
 
-	err = sess.SaveDepth(context.Background(), user, 2)
+	err = sess.SaveDepth(context.Background(), comment, 2)
 	if err != nil {
 		panic(err)
 	}
@@ -248,7 +241,7 @@ func (c *comment) Report(CommentID string, UserID string) bool {
 	return true
 }
 
-func (c *comment) AddReply(UserId, ParentId string, comment entity.Comment) *entity.Comment {
+func (c *comment) Reply(UserId, ParentId string, comment entity.Comment) *entity.Comment {
 	sess, err := c.driver.NewSessionV2(gogm.SessionConfig{AccessMode: gogm.AccessModeWrite})
 	if err != nil {
 		panic(err)
@@ -264,7 +257,7 @@ func (c *comment) AddReply(UserId, ParentId string, comment entity.Comment) *ent
 	comment.Type = "reply"
 	parent := c.GetComment(ParentId)
 	user := c.GetUser(UserId)
-	reply := c.AddRaw(user, parent.Target, parent.App, comment)
+	reply := c.AddRaw(user, nil, parent.App, comment)
 	parent.Replies = append(parent.Replies, reply)
 
 	err = sess.SaveDepth(context.Background(), parent, 2)
@@ -305,7 +298,6 @@ func (c *comment) GetComment(CommentId string) *entity.Comment {
 	err = sess.Load(context.Background(), comment, CommentId)
 	if err != nil {
 		log.Println(err.Error())
-		panic(err)
 	}
 
 	return comment
@@ -320,10 +312,9 @@ func (c *comment) GetTarget(TargetId string) *entity.Target {
 
 	target := &entity.Target{}
 
-	err = sess.Load(context.Background(), target, TargetId)
+	err = sess.LoadDepth(context.Background(), target, TargetId, 3)
 	if err != nil {
 		log.Println(err.Error())
-		panic(err)
 	}
 
 	return target
@@ -341,7 +332,7 @@ func (c *comment) GetApp(AppId string) *entity.App {
 	err = sess.Load(context.Background(), app, &AppId)
 	if err != nil {
 		log.Println(err.Error())
-		return nil
+		return app
 	}
 
 	return app

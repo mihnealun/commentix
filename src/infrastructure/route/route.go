@@ -27,6 +27,30 @@ func PreparePublicRoutes(e *echo.Echo, containerInstance container.Container) {
 		return ctrl.Create(c, containerInstance)
 	})
 
+	e.POST("/comment/reply", func(c echo.Context) error {
+		ctrl := controller.Comment{}
+
+		return ctrl.Reply(c, containerInstance)
+	})
+
+	e.POST("/comment/like", func(c echo.Context) error {
+		ctrl := controller.Comment{}
+
+		return ctrl.Like(c, containerInstance)
+	})
+
+	e.POST("/comment/dislike", func(c echo.Context) error {
+		ctrl := controller.Comment{}
+
+		return ctrl.Dislike(c, containerInstance)
+	})
+
+	e.POST("/comment/report", func(c echo.Context) error {
+		ctrl := controller.Comment{}
+
+		return ctrl.Report(c, containerInstance)
+	})
+
 	// -------------------- USER -------------------------
 	e.GET("/user/:id", func(c echo.Context) error {
 		userController := controller.User{}
