@@ -9,6 +9,8 @@ type User struct {
 	Name             string     `gogm:"name=name"`
 	Type             string     `gogm:"name=type"`
 	Status           string     `gogm:"name=status"`
+	CreatedAt        int64      `gogm:"name=created_at"`
+	UpdatedAt        int64      `gogm:"name=updated_at"`
 	Comments         []*Comment `gogm:"direction=outgoing;relationship=CREATED"`
 	DislikedComments []*Comment `gogm:"direction=outgoing;relationship=DISLIKED"`
 	LikedComments    []*Comment `gogm:"direction=outgoing;relationship=LIKED"`
@@ -23,6 +25,8 @@ type Target struct {
 	Name      string     `gogm:"name=name"`
 	Type      string     `gogm:"name=type"`
 	Url       string     `gogm:"name=url"`
+	CreatedAt int64      `gogm:"name=created_at"`
+	UpdatedAt int64      `gogm:"name=updated_at"`
 	Comments  []*Comment `gogm:"direction=incoming;relationship=TARGETS"`
 	Likers    []*User    `gogm:"direction=incoming;relationship=LIKED"`
 	Dislikers []*User    `gogm:"direction=incoming;relationship=DISLIKED"`
@@ -31,9 +35,11 @@ type Target struct {
 
 type App struct {
 	gogm.BaseUUIDNode
-	Name     string     `gogm:"name=name"`
-	Slug     string     `gogm:"name=slug"`
-	Comments []*Comment `gogm:"direction=incoming;relationship=POSTED_ON"`
+	Name      string     `gogm:"name=name"`
+	Slug      string     `gogm:"name=slug"`
+	CreatedAt int64      `gogm:"name=created_at"`
+	UpdatedAt int64      `gogm:"name=updated_at"`
+	Comments  []*Comment `gogm:"direction=incoming;relationship=POSTED_ON"`
 }
 
 type Comment struct {
@@ -41,7 +47,8 @@ type Comment struct {
 	Body      string     `gogm:"name=body"`
 	Type      string     `gogm:"name=type"`
 	Status    string     `gogm:"name=status"`
-	CreatedAt int        `gogm:"name=created_at"`
+	CreatedAt int64      `gogm:"name=created_at"`
+	UpdatedAt int64      `gogm:"name=updated_at"`
 	User      *User      `gogm:"direction=incoming;relationship=CREATED"`
 	Target    *Target    `gogm:"direction=outgoing;relationship=TARGETS"`
 	App       *App       `gogm:"direction=outgoing;relationship=POSTED_ON"`

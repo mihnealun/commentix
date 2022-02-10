@@ -19,7 +19,7 @@
 
 package gogm
 
-import "errors"
+//import "errors"
 
 // pagination configuration
 type Pagination struct {
@@ -36,9 +36,9 @@ type Pagination struct {
 }
 
 func (p *Pagination) Validate() error {
-	if p.PageNumber >= 0 && p.LimitPerPage > 1 && p.OrderByField != "" && p.OrderByVarName != "" {
-		return errors.New("pagination configuration invalid, please double check")
-	}
+	//if p.PageNumber == 0 || p.LimitPerPage == 0 || p.OrderByField == "" || p.OrderByVarName == "" {
+	//	return errors.New("pagination configuration invalid, please double check")
+	//}
 
 	return nil
 }

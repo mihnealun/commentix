@@ -6,6 +6,7 @@ import (
 	"github.com/mihnealun/commentix/domain/service"
 	"github.com/mindstand/gogm/v2"
 	"log"
+	"time"
 )
 
 type comment struct {
@@ -38,6 +39,9 @@ func (c *comment) Create(UserId, TargetId, AppId string, comment entity.Comment)
 		log.Println("Entity not found")
 		return nil
 	}
+
+	comment.CreatedAt = time.Now().Unix()
+	comment.UpdatedAt = time.Now().Unix()
 
 	err = sess.SaveDepth(context.Background(), &comment, 2)
 	if err != nil {
@@ -73,6 +77,8 @@ func (c *comment) AddRaw(User *entity.User, Target *entity.Target, App *entity.A
 	if err != nil {
 		panic(err)
 	}
+
+	//res, summary, errr := sess.QueryRaw(context.Background(), "", map[string]interface{}{})
 
 	var result entity.Comment
 	err = sess.Load(context.Background(), &result, Comment.UUID)
@@ -151,6 +157,17 @@ func (c *comment) Like(CommentID string, UserID string) bool {
 		}
 	}
 
+	// Remove also previous dislikes
+	if comment.Dislikers != nil {
+		for i, disliker := range comment.Dislikers {
+			if disliker.UUID == user.UUID {
+				// Remove earlier dislike
+				comment.Dislikers = append(comment.Dislikers[:i], comment.Dislikers[i+1:]...)
+				break
+			}
+		}
+	}
+
 	user.LikedComments = append(user.LikedComments, comment)
 	comment.Likers = append(comment.Likers, user)
 
@@ -182,11 +199,23 @@ func (c *comment) Dislike(CommentID string, UserID string) bool {
 
 	user := c.GetUser(UserID)
 
+	// Check if already disliked
 	if comment.Dislikers != nil {
 		for _, disliker := range comment.Dislikers {
 			if disliker.UUID == user.UUID {
 				// Already disliked
 				return false
+			}
+		}
+	}
+
+	// Remove also previous likes
+	if comment.Likers != nil {
+		for i, liker := range comment.Likers {
+			if liker.UUID == user.UUID {
+				// Remove earlier like
+				comment.Likers = append(comment.Likers[:i], comment.Likers[i+1:]...)
+				break
 			}
 		}
 	}
@@ -312,7 +341,17 @@ func (c *comment) GetTarget(TargetId string) *entity.Target {
 
 	target := &entity.Target{}
 
-	err = sess.LoadDepth(context.Background(), target, TargetId, 3)
+	// pagination.Validate official code is wrong... fixed locally but needs further improvement !
+	pag := &gogm.Pagination{
+		PageNumber:     1,
+		LimitPerPage:   100,
+		OrderByVarName: "n.Comments",
+		OrderByField:   "createdAt",
+		OrderByDesc:    true,
+	}
+
+	// TODO: do some analysis on the way LoadDepthFilterPagination works (sorting is not working as expected)
+	err = sess.LoadDepthFilterPagination(context.Background(), target, TargetId, 3, nil, nil, pag)
 	if err != nil {
 		log.Println(err.Error())
 	}

@@ -26,6 +26,8 @@ type CommentResponse struct {
 	Reports    int               `json:"reports"`
 	ReplyCount int               `json:"reply_count"`
 	Replies    []CommentResponse `json:"replies"`
+	CreatedAt  int64             `json:"created_at"`
+	UpdatedAt  int64             `json:"updated_at"`
 }
 
 func NewCommentResponse(comment *entity.Comment) CommentResponse {
@@ -56,6 +58,8 @@ func NewCommentResponse(comment *entity.Comment) CommentResponse {
 		Dislikes:   len(comment.Dislikers),
 		Reports:    len(comment.Reporters),
 		ReplyCount: len(comment.Replies),
+		CreatedAt:  comment.CreatedAt,
+		UpdatedAt:  comment.UpdatedAt,
 	}
 
 	if comment.Target != nil {
